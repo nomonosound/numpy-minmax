@@ -1,7 +1,3 @@
-#include <immintrin.h>
-#include <math.h>
-#include <string.h>
-
 typedef struct {
     float min_val;
     float max_val;
@@ -12,8 +8,8 @@ MinMaxResult minmax(float *a, size_t length) {
 
     if (length <= 0) {
         // Handle the case where the array is empty or length is invalid
-        result.min_val = FLT_MAX;
-        result.max_val = FLT_MIN;
+        result.min_val = 0.0;
+        result.max_val = 0.0;
         return result;
     }
 
@@ -25,8 +21,7 @@ MinMaxResult minmax(float *a, size_t length) {
     for (int i = 1; i < length; i++) {
         if (a[i] < result.min_val) {
             result.min_val = a[i]; // Update min_val if a smaller value is found
-        }
-        if (a[i] > result.max_val) {
+        } else if (a[i] > result.max_val) {
             result.max_val = a[i]; // Update max_val if a larger value is found
         }
     }
