@@ -4,6 +4,8 @@ import numpy as np
 
 import numpy_minmax
 
+import diplib as dip
+
 
 class timer(object):
     """
@@ -52,12 +54,18 @@ class TestMinMax:
         assert max_val == 1.0
 
     def test_perf(self):
-        a = np.random.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
+        a = np.random.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(
+            np.float32
+        )
 
         with timer("numpy.amax and numpy.amin sequentially"):
             min_val = np.amin(a)
             max_val = np.amax(a)
             print(min_val, max_val)
+
+        with timer("diplib"):
+            min_val, max_val = dip.MaximumAndMinimum(a)
+            print(min_val, max_val, 'diplib')
 
         with timer("minmax"):
             min_val, max_val = numpy_minmax.minmax(a)
