@@ -13,7 +13,7 @@ MinMaxResult minmax(float *a, size_t length) {
         return result;
     }
 
-    // Initialize min and max with the first element of the array
+    // Initialize min and max with the last element of the array
     result.min_val = a[length-1];
     result.max_val = a[length-1];
 
