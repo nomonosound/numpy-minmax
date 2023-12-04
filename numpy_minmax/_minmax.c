@@ -30,17 +30,5 @@ MinMaxResult minmax(float *a, size_t length) {
         }
     }
 
-    /*
-    // old approach: requires 2n comparisons
-    // Iterate over the array, starting from the second element
-    for (int i = 1; i < length; i++) {
-        if (a[i] < result.min_val) {
-            result.min_val = a[i]; // Update min_val if a smaller value is found
-        } else if (a[i] > result.max_val) {
-            result.max_val = a[i]; // Update max_val if a larger value is found
-        }
-    }
-    */
-
     return result;
 }
