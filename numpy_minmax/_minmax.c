@@ -22,8 +22,12 @@ MinMaxResult minmax(float *a, size_t length) {
         float smaller = a[i] < a[i + 1] ? a[i] : a[i + 1];
         float larger = a[i] < a[i + 1] ? a[i + 1] : a[i];
 
-        result.min_val = result.min_val < smaller ? result.min_val : smaller;
-        result.max_val = result.max_val > larger ? result.max_val : larger;
+        if (smaller < result.min_val) {
+            result.min_val = smaller;
+        }
+        if (larger > result.max_val) {
+            result.max_val = larger;
+        }
     }
 
     /*
