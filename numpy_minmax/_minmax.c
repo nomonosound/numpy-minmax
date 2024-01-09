@@ -18,7 +18,7 @@ MinMaxResult minmax(float *a, size_t length) {
     result.max_val = result.min_val;
 
     // Process elements in pairs
-    for (int i = 0; i < length - 1; i += 2) {
+    for (size_t i = 0; i < length - 1; i += 2) {
         float smaller = a[i] < a[i + 1] ? a[i] : a[i + 1];
         float larger = a[i] < a[i + 1] ? a[i + 1] : a[i];
 
