@@ -51,6 +51,11 @@ if __name__ == "__main__":
         min_val, max_val = dip.MaximumAndMinimum(a)
         print(min_val, max_val, "diplib")
 
-    with timer("minmax"):
-        min_val, max_val = numpy_minmax.minmax(a)
-        print(min_val, max_val)
+    times = []
+    for i in range(5):
+        with timer("minmax") as t:
+            min_val, max_val = numpy_minmax.minmax(a)
+            print(min_val, max_val)
+        times.append(t.execution_time)
+
+    print(f"===\nnumpy-minmax median: {np.median(times):.3f}")
