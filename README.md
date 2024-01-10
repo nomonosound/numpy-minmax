@@ -1,6 +1,8 @@
 # numpy-minmax: a fast function for finding the minimum and maximum value in a numpy array
 
-
+* Written in C and takes advantage of AVX2 for speed
+* Roughly 2.3x faster than the numpy amin+amax equivalent (tested with numpy 1.26)
+* Works for 1-dimensional float32 arrays
 
 # Installation
 
