@@ -20,7 +20,7 @@ import numpy as np
 # Development
 
 * Install dev/build/test dependencies as denoted in setup.py
-* `python setup.py develop`
+* `pip install -e .`
 * `pytest`
 
 # Acknowledgements
