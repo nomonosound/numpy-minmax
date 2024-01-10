@@ -6,7 +6,39 @@ typedef struct {
     float max_val;
 } MinMaxResult;
 
-MinMaxResult minmax(float *a, size_t length) {
+MinMaxResult minmax_pairwise(float *a, size_t length) {
+    MinMaxResult result;
+
+    if (length <= 0) {
+        // Handle the case where the array is empty or length is invalid
+        result.min_val = 0.0;
+        result.max_val = 0.0;
+        return result;
+    }
+
+    // Initialize min and max with the last element of the array.
+    // This ensures that it works correctly for odd length arrays as well as even.
+    result.min_val = a[length-1];
+    result.max_val = result.min_val;
+
+    // Process elements in pairs
+    for (size_t i = 0; i < length - 1; i += 2) {
+        float smaller = a[i] < a[i + 1] ? a[i] : a[i + 1];
+        float larger = a[i] < a[i + 1] ? a[i + 1] : a[i];
+
+        if (smaller < result.min_val) {
+            result.min_val = smaller;
+        }
+        if (larger > result.max_val) {
+            result.max_val = larger;
+        }
+    }
+
+    return result;
+}
+
+
+MinMaxResult minmax_avx2(float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     // Return early for empty arrays
@@ -41,4 +73,12 @@ MinMaxResult minmax(float *a, size_t length) {
     }
 
     return result;
+}
+
+MinMaxResult minmax(float *a, size_t length) {
+    if (length >= 16) {
+        return minmax_avx2(a, length);
+    } else {
+        return minmax_pairwise(a, length);
+    }
 }

@@ -39,7 +39,8 @@ class timer(object):
         print("{}: {:.3f} s".format(self.description, self.execution_time))
 
 
-if __name__ == "__main__":
+def perf_benchmark_large_c_contiguous():
+    print("===\nperf_benchmark_large_c_contiguous:")
     a = np.random.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
 
     with timer("numpy.amax and numpy.amin sequentially"):
@@ -59,3 +60,33 @@ if __name__ == "__main__":
         times.append(t.execution_time)
 
     print(f"===\nnumpy-minmax median: {np.median(times):.3f}")
+
+
+def perf_benchmark_large_not_c_contiguous():
+    print("===\nperf_benchmark_large_not_c_contiguous:")
+    a = np.flip(
+        np.random.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
+    )
+
+    with timer("numpy.amax and numpy.amin sequentially"):
+        min_val = np.amin(a)
+        max_val = np.amax(a)
+        print(min_val, max_val)
+
+    with timer("diplib"):
+        min_val, max_val = dip.MaximumAndMinimum(a)
+        print(min_val, max_val, "diplib")
+
+    times = []
+    for i in range(5):
+        with timer("minmax") as t:
+            min_val, max_val = numpy_minmax.minmax(np.ascontiguousarray(a))
+            print(min_val, max_val)
+        times.append(t.execution_time)
+
+    print(f"===\nnumpy-minmax median: {np.median(times):.3f}")
+
+
+if __name__ == "__main__":
+    perf_benchmark_large_c_contiguous()
+    perf_benchmark_large_not_c_contiguous()

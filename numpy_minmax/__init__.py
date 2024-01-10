@@ -10,15 +10,18 @@ __version__ = "0.0.1"
 def minmax(
     a: NDArray[np.float32],
 ) -> Tuple:
-    """
-    TODO
-    """
-    assert a.dtype == np.dtype("float32"), "The given array must be float32"
-    assert a.ndim == 1
-    assert a.flags["C_CONTIGUOUS"], "The arrays must be C-contiguous"
-
-    result = _numpy_minmax.lib.minmax(
-        _numpy_minmax.ffi.cast("float *", a.ctypes.data),
-        len(a),
-    )
-    return result.min_val, result.max_val
+    if a.dtype == np.dtype("float32") and a.ndim == 1:
+        if a.flags["C_CONTIGUOUS"]:
+            result = _numpy_minmax.lib.minmax(
+                _numpy_minmax.ffi.cast("float *", a.ctypes.data),
+                len(a),
+            )
+        else:
+            # TODO: There is room for improvement here, as diplib is ~3x faster in this case
+            result = _numpy_minmax.lib.minmax(
+                _numpy_minmax.ffi.cast("float *", np.ascontiguousarray(a).ctypes.data),
+                len(a),
+            )
+        return np.float32(result.min_val), np.float32(result.max_val)
+    else:
+        return np.amin(a), np.amax(a)
