@@ -7,9 +7,7 @@ from numpy.typing import NDArray
 __version__ = "0.0.1"
 
 
-def minmax(
-    a: NDArray[np.float32],
-) -> Tuple:
+def minmax(a: NDArray) -> Tuple:
     if a.dtype == np.dtype("float32") and a.ndim == 1:
         if a.flags["C_CONTIGUOUS"]:
             result = _numpy_minmax.lib.minmax(
