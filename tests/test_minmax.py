@@ -53,11 +53,23 @@ class TestMinMax:
         assert isinstance(min_val, np.float64)
         assert isinstance(max_val, np.float64)
 
-    def test_minmax_2d_shape(self):
-        arr = np.arange(16, dtype=np.float32).reshape((2, 8))
+    def test_minmax_2d_small1(self):
+        arr = np.random.uniform(low=-6.0, high=3.0, size=(15, 2)).astype(np.float32)
         min_val, max_val = numpy_minmax.minmax(arr)
-        assert min_val == 0.0
-        assert max_val == 15.0
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
+
+    def test_minmax_2d_small2(self):
+        arr = np.random.uniform(low=-6.0, high=3.0, size=(2, 15)).astype(np.float32)
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
+
+    def test_minmax_2d_shape_large(self):
+        arr = np.random.uniform(low=-6.0, high=3.0, size=(2, 999)).astype(np.float32)
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
 
     @pytest.mark.parametrize("shape", [(0,), (0, 0)])
     def test_minmax_empty_array(self, shape):

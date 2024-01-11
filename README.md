@@ -22,7 +22,7 @@ import numpy as np
 # Development
 
 * Install dev/build/test dependencies as denoted in setup.py
-* `pip install -e .`
+* `CC=clang pip install -e .`
 * `pytest`
 
 # Acknowledgements

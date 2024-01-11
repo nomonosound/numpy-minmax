@@ -79,7 +79,6 @@ MinMaxResult minmax_1d(float *a, size_t length) {
     if (length >= 16) {
         return minmax_avx2_1d(a, length);
     } else {
-        // TODO: test if this is faster than the numpy equivalent
         return minmax_pairwise_1d(a, length);
     }
 }
@@ -124,12 +123,42 @@ MinMaxResult minmax_avx2_2d(float *a, size_t shape_0, size_t shape_1) {
     return result;
 }
 
+MinMaxResult minmax_pairwise_2d(float *a, size_t shape_0, size_t shape_1) {
+    MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
+
+    // Return early for empty arrays
+    if (shape_0 == 0 || shape_1 == 0) {
+        return (MinMaxResult){0.0, 0.0};
+    }
+
+    for (size_t row = 0; row < shape_0; ++row) {
+        size_t i = 0;
+        float* row_ptr = a + (row * shape_1);
+
+        // Initialize min and max for the row. Handle edge case for odd number of elements.
+        if (shape_1 % 2 != 0) {
+            float last_elem = row_ptr[shape_1 - 1];
+            if (last_elem < result.min_val) result.min_val = last_elem;
+            if (last_elem > result.max_val) result.max_val = last_elem;
+        }
+
+        // Process elements in pairs for each row
+        for (; i < shape_1 - 1; i += 2) {
+            float smaller = row_ptr[i] < row_ptr[i + 1] ? row_ptr[i] : row_ptr[i + 1];
+            float larger = row_ptr[i] < row_ptr[i + 1] ? row_ptr[i + 1] : row_ptr[i];
+
+            if (smaller < result.min_val) result.min_val = smaller;
+            if (larger > result.max_val) result.max_val = larger;
+        }
+    }
+
+    return result;
+}
+
 MinMaxResult minmax_2d(float *a, size_t shape_0, size_t shape_1) {
-    return minmax_avx2_2d(a, shape_0, shape_1);
-    // TODO:
-//    if (shape_1 >= 16) {
-//        return minmax_avx2_2d(a, length);
-//    } else {
-//        return minmax_pairwise_2d(a, length);
-//    }
+    if (shape_1 >= 16) {
+        return minmax_avx2_2d(a, shape_0, shape_1);
+    } else {
+        return minmax_pairwise_2d(a, shape_0, shape_1);
+    }
 }

@@ -1,5 +1,5 @@
 * Bump version in `numpy_minmax/__init__.py`
-* `pip install -e . && pytest`
+* `CC=clang pip install -e . && pytest`
 * Update CHANGELOG.md
 * Commit and push the change with a commit message like this: "Release vx.y.z" (replace x.y.z with the package version)
 * Wait for build workflow in Github Actions to complete

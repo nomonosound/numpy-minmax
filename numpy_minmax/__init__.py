@@ -17,7 +17,7 @@ def minmax(a: NDArray) -> Tuple:
                 len(a),
             )
             return np.float32(result.min_val), np.float32(result.max_val)
-        elif a.ndim == 2 and a.shape[1] > 16:
+        elif a.ndim == 2:
             result = _numpy_minmax.lib.minmax_2d(
                 _numpy_minmax.ffi.cast("float *", a.ctypes.data),
                 a.shape[0],
