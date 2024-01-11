@@ -32,7 +32,7 @@ setup(
     license="ISC",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(exclude=["tests"]),
+    packages=find_packages(exclude=["scripts", "tests"]),
     setup_requires=["cffi>=1.0.0"],
     tests_require=["pytest"],
     cffi_modules=["numpy_minmax/_minmax_cffi.py:ffibuilder"],
