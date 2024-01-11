@@ -10,7 +10,10 @@ ffibuilder.cdef("""
     } MinMaxResult;
 """)
 ffibuilder.cdef(
-    "MinMaxResult minmax(float *, size_t);"
+    "MinMaxResult minmax_1d(float *, size_t);"
+)
+ffibuilder.cdef(
+    "MinMaxResult minmax_2d(float *, size_t, size_t);"
 )
 
 script_dir = os.path.dirname(os.path.realpath(__file__))

@@ -27,7 +27,7 @@ setup(
     name="numpy-minmax",
     version=find_version("numpy_minmax", "__init__.py"),
     description=(
-        "A fast python library for finding min and max in a NumPy array"
+        "A fast python library for finding both min and max in a NumPy array"
     ),
     license="ISC",
     long_description=long_description,

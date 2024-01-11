@@ -53,13 +53,14 @@ class TestMinMax:
         assert isinstance(min_val, np.float64)
         assert isinstance(max_val, np.float64)
 
-    def test_minmax_2d_shape_numpy_fallback(self):
+    def test_minmax_2d_shape(self):
         arr = np.arange(16, dtype=np.float32).reshape((2, 8))
         min_val, max_val = numpy_minmax.minmax(arr)
         assert min_val == 0.0
         assert max_val == 15.0
 
-    def test_minmax_empty_array(self):
-        arr = np.empty(shape=(0, 0), dtype=np.float32)
+    @pytest.mark.parametrize("shape", [(0,), (0, 0)])
+    def test_minmax_empty_array(self, shape):
+        arr = np.empty(shape=shape, dtype=np.float32)
         with pytest.raises(ValueError):
             numpy_minmax.minmax(arr)
