@@ -29,7 +29,7 @@ setup(
     description=(
         "A fast python library for finding both min and max in a NumPy array"
     ),
-    license="ISC",
+    license="MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["scripts", "tests"]),
