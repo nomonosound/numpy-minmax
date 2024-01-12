@@ -78,6 +78,17 @@ class TestMinMax:
         assert min_val == np.amin(arr)
         assert max_val == np.amax(arr)
 
+    def test_minmax_unaligned(self):
+        # Allocate memory and create an unaligned array from that
+        buf = np.arange(402, dtype=np.uint8)
+        arr = np.frombuffer(buf.data, offset=2, count=100, dtype=np.float32)
+        arr.shape = 10, 10
+        assert arr.flags["ALIGNED"] == False
+
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
+
     def test_minmax_3d_shape(self):
         arr = np.random.uniform(low=-6.0, high=3.0, size=(2, 2, 16)).astype(np.float32)
         min_val, max_val = numpy_minmax.minmax(arr)
