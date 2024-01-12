@@ -1,10 +1,9 @@
 [build-system]
-requires = ["setuptools>=68", "wheel", "cffi>=1.0.0"]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=7.0.1", "wheel", "cffi>=1.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "numpy-minmax"
-version = "0.1.0"  # TODO: replace with dynamic retrieval method
 description = "A fast python library for finding both min and max in a NumPy array"
 dependencies = [
     "numpy>=1.21"
@@ -26,6 +25,9 @@ classifiers = [
 ]
 urls = { "Homepage" = "https://github.com/nomonosound/numpy-minmax" }
 
+[tool.setuptools_scm]
+write_to = "numpy_minmax/_version.py"
+
 [project.optional-dependencies]
 test = ["pytest"]
 
@@ -34,4 +36,7 @@ test-requires = ["cffi", "pytest"]
 test-command = "pytest {project}/tests"
 
 [tool.setuptools.packages.find]
-exclude = ["scripts*", "tests*"]
+exclude = ["scripts", "tests"]
+
+[tool.pytest]
+testpaths = ["tests"]
