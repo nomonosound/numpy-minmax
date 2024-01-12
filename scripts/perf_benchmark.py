@@ -5,6 +5,7 @@ import numpy as np
 
 import numpy_minmax
 
+rng = np.random.default_rng()
 
 class timer(object):
     """
@@ -43,7 +44,7 @@ def perf_benchmark_many_small_1d_c_contiguous():
     print("===\nperf_benchmark_many_small_1d_c_contiguous:")
     arrays = []
     for i in range(100_000):
-        a = np.random.uniform(low=-4.0, high=3.9, size=(9,)).astype(np.float32)
+        a = rng.uniform(low=-4.0, high=3.9, size=(9,)).astype(np.float32)
         arrays.append(a)
 
     with timer("numpy.amax and numpy.amin sequentially"):
@@ -64,7 +65,7 @@ def perf_benchmark_many_small_2d_c_contiguous():
     print("===\nperf_benchmark_many_small_2d_c_contiguous:")
     arrays = []
     for i in range(100_000):
-        a = np.random.uniform(low=-4.0, high=3.9, size=(3, 9)).astype(np.float32)
+        a = rng.uniform(low=-4.0, high=3.9, size=(3, 9)).astype(np.float32)
         arrays.append(a)
 
     with timer("numpy.amax and numpy.amin sequentially"):
@@ -83,7 +84,7 @@ def perf_benchmark_many_small_2d_c_contiguous():
 
 def perf_benchmark_large_1d_c_contiguous():
     print("===\nperf_benchmark_large_1d_c_contiguous:")
-    a = np.random.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
+    a = rng.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
 
     with timer("numpy.amax and numpy.amin sequentially"):
         min_val = np.amin(a)
@@ -106,7 +107,7 @@ def perf_benchmark_large_1d_c_contiguous():
 
 def perf_benchmark_large_2d_c_contiguous():
     print("===\nperf_benchmark_large_2d_c_contiguous:")
-    a = np.random.uniform(low=-4.0, high=3.9, size=(2, 999_999_999)).astype(np.float32)
+    a = rng.random(size=(2, 999_999_999), dtype=np.float32)
 
     with timer("numpy.amax and numpy.amin sequentially"):
         min_val = np.amin(a)
@@ -127,10 +128,33 @@ def perf_benchmark_large_2d_c_contiguous():
     print(f"===\nnumpy-minmax median: {np.median(times):.3f}")
 
 
+def perf_benchmark_large_2d_f_contiguous():
+    print("===\nperf_benchmark_large_2d_f_contiguous:")
+    a = rng.random(size=(2, 999_999_999), dtype=np.float32)
+    a = np.asfortranarray(a)
+
+    with timer("numpy.amax and numpy.amin sequentially"):
+        min_val = np.amin(a)
+        max_val = np.amax(a)
+        print(min_val, max_val)
+
+    with timer("diplib"):
+        min_val, max_val = dip.MaximumAndMinimum(a)
+        print(min_val, max_val, "diplib")
+
+    times = []
+    for i in range(5):
+        with timer("minmax") as t:
+            min_val, max_val = numpy_minmax.minmax(a)
+            print(min_val, max_val)
+        times.append(t.execution_time)
+
+    print(f"===\nnumpy-minmax median: {np.median(times):.3f}")
+
 def perf_benchmark_large_1d_not_c_contiguous():
     print("===\nperf_benchmark_large_1d_not_c_contiguous:")
     a = np.flip(
-        np.random.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
+        rng.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
     )
 
     with timer("numpy.amax and numpy.amin sequentially"):
@@ -155,7 +179,7 @@ def perf_benchmark_large_1d_not_c_contiguous():
 def perf_benchmark_large_2d_not_c_contiguous():
     print("===\nperf_benchmark_large_2d_not_c_contiguous:")
     a = np.flip(
-        np.random.uniform(low=-4.0, high=3.9, size=(2, 999_999_999)).astype(np.float32)
+        rng.random(size=(2, 299_999_999), dtype=np.float32)
     )
 
     times = []
@@ -183,4 +207,5 @@ if __name__ == "__main__":
     perf_benchmark_large_1d_c_contiguous()
     perf_benchmark_large_1d_not_c_contiguous()
     perf_benchmark_large_2d_c_contiguous()
-    perf_benchmark_large_1d_not_c_contiguous()
+    perf_benchmark_large_2d_f_contiguous()
+    perf_benchmark_large_2d_not_c_contiguous()
