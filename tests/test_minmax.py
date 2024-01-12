@@ -71,6 +71,12 @@ class TestMinMax:
         assert min_val == np.amin(arr)
         assert max_val == np.amax(arr)
 
+    def test_minmax_3d_shape(self):
+        arr = np.random.uniform(low=-6.0, high=3.0, size=(2, 2, 16)).astype(np.float32)
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
+
     @pytest.mark.parametrize("shape", [(0,), (0, 0)])
     def test_minmax_empty_array(self, shape):
         arr = np.empty(shape=shape, dtype=np.float32)
