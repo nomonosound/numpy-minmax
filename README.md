@@ -32,6 +32,10 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 * `CC=clang pip install -e .`
 * `pytest`
 
+# Running benchmarks
+* Install diplib `pip install diplib`
+* `python scripts/perf_benchmark.py`
+
 # Acknowledgements
 
 This library is maintained/backed by [Nomono](https://nomono.co/), a Norwegian audio AI startup.
