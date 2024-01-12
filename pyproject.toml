@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=7.0.1", "wheel", "cffi>=1.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "numpy-minmax"
+version = "0.1.0"
+description = "A fast python library for finding both min and max in a NumPy array"
+dependencies = [
+    "numpy>=1.21"
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Scientific/Engineering",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+urls = { "Homepage" = "https://github.com/nomonosound/numpy-minmax" }
+
+[tool.setuptools_scm]
+write_to = "numpy_minmax/_version.py"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.cibuildwheel]
+test-requires = ["cffi", "pytest"]
+test-command = "pytest {project}/tests"
+
+[tool.setuptools.packages.find]
+exclude = ["scripts", "tests", "wheelhouse"]
+
+[tool.pytest]
+testpaths = ["tests"]

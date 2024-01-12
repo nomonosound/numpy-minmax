@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
+    #branches: [ main ]
     paths-ignore:
       - "**/**.md"
 jobs:
@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-version: [3.9]
 
-    if: startsWith(github.event.head_commit.message, 'Release')
+    #if: startsWith(github.event.head_commit.message, 'Release')
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -28,8 +28,6 @@ jobs:
         env:
           CIBW_ARCHS: "auto64"
           CIBW_SKIP: "cp36-* cp37-* pp37-* pp310-* cp312-*"
-          CIBW_TEST_REQUIRES: cffi pytest
-          CIBW_TEST_COMMAND: "pytest {project}/tests"
         run: |
           python -m cibuildwheel --output-dir wheelhouse
       - name: Save Wheels
