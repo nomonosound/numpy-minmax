@@ -1,6 +1,6 @@
-# numpy-minmax: a fast function for finding the minimum and maximum value in a numpy array
+# numpy-minmax: a fast function for finding the minimum and maximum value in a NumPy array
 
-Numpy lacked an optimized minmax function, so we wrote our own. We apply it to audio (channels first), but it can also be applied to other kinds of data of similar shape.
+NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we use it for audio processing, but it can also be applied to other kinds of data of similar shape.
 
 * Written in C and takes advantage of AVX2 for speed
 * Roughly 2.3x faster than the numpy amin+amax equivalent (tested with numpy 1.24-1.26)
