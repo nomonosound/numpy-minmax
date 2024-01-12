@@ -44,7 +44,7 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering",
-        "License :: OSI Approved :: ISC License (ISCL)",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
