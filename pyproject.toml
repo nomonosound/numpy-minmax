@@ -37,7 +37,7 @@ test-requires = ["cffi", "pytest"]
 test-command = "pytest {project}/tests"
 
 [tool.setuptools.packages.find]
-exclude = ["scripts", "tests"]
+exclude = ["scripts", "tests", "wheelhouse"]
 
 [tool.pytest]
 testpaths = ["tests"]
