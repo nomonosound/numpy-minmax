@@ -78,6 +78,19 @@ class TestMinMax:
         assert min_val == np.amin(arr)
         assert max_val == np.amax(arr)
 
+    def test_minimax_1d_non_contiguous(self):
+        arr = np.random.uniform(low=-6.0, high=3.0, size=(27,)).astype(np.float32)[::2]
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
+
+    def test_minimax_1d_non_contiguous_negative_stride(self):
+        arr = np.random.uniform(low=-6.0, high=3.0, size=(27,)).astype(np.float32)[::-1]
+        print(arr.strides)
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == np.amin(arr)
+        assert max_val == np.amax(arr)
+
     def test_minmax_unaligned(self):
         # Allocate memory and create an unaligned array from that
         buf = np.arange(402, dtype=np.uint8)

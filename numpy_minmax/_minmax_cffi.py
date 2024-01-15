@@ -12,6 +12,9 @@ ffibuilder.cdef("""
 ffibuilder.cdef(
     "MinMaxResult minmax_contiguous(float *, size_t);"
 )
+ffibuilder.cdef(
+    "MinMaxResult minmax_1d(float *, size_t, long);"
+)
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 c_file_path = os.path.join(script_dir, "_minmax.c")

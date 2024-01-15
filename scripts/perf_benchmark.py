@@ -153,9 +153,11 @@ def perf_benchmark_large_2d_f_contiguous():
 
 def perf_benchmark_large_1d_not_c_contiguous():
     print("===\nperf_benchmark_large_1d_not_c_contiguous:")
-    a = np.flip(
-        rng.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
-    )
+   # a = np.flip(
+   #     rng.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)
+   # )
+    a = rng.uniform(low=-4.0, high=3.9, size=(999_999_999,)).astype(np.float32)[::5]
+    print(a.strides)
 
     with timer("numpy.amax and numpy.amin sequentially"):
         min_val = np.amin(a)
@@ -169,7 +171,7 @@ def perf_benchmark_large_1d_not_c_contiguous():
     times = []
     for i in range(5):
         with timer("minmax") as t:
-            min_val, max_val = numpy_minmax.minmax(np.ascontiguousarray(a))
+            min_val, max_val = numpy_minmax.minmax(a)
             print(min_val, max_val)
         times.append(t.execution_time)
 
