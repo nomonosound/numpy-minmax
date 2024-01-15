@@ -20,11 +20,9 @@ def minmax(a: NDArray) -> Tuple:
             )
             return np.float32(result.min_val), np.float32(result.max_val)
         if a.ndim == 1:
-            result = _numpy_minmax.lib.minmax_1d(
+            result = _numpy_minmax.lib.minmax_1d_strided(
                 _numpy_minmax.ffi.cast("float *", a.ctypes.data), a.size, a.strides[0]
             )
             return np.float32(result.min_val), np.float32(result.max_val)
-       strides = np.array(a.strides)
-       min_stride = np.amin(np.strides)
-       if np.all(strides % min_stride == 0):
+       # TODO: Find multi-dim arrays that can be simplified to a single stride
     return np.amin(a), np.amax(a)

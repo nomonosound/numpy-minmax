@@ -77,6 +77,8 @@ MinMaxResult minmax_contiguous(float *a, size_t length) {
     }
 }
 
+// Takes the pairwise min/max on strided input. Strides are in number of bytes,
+// which is why the data pointer is char
 MinMaxResult minmax_pairwise_strided(char *a, size_t length, long stride) {
     MinMaxResult result;
 
@@ -107,6 +109,8 @@ MinMaxResult minmax_pairwise_strided(char *a, size_t length, long stride) {
     return result;
 }
 
+// Takes the avx min/max on strided input. Strides are in number of bytes,
+// which is why the data pointer is char
 MinMaxResult minmax_avx_strided(char *a, size_t length, long stride) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
@@ -151,7 +155,7 @@ MinMaxResult minmax_avx_strided(char *a, size_t length, long stride) {
 }
 
 
-MinMaxResult minmax_1d(float *a, size_t length, long stride) {
+MinMaxResult minmax_1d_strided(float *a, size_t length, long stride) {
     // Return early for empty arrays
     if (length == 0) {
         return (MinMaxResult){0.0, 0.0};
@@ -160,9 +164,14 @@ MinMaxResult minmax_1d(float *a, size_t length, long stride) {
         if (-stride == sizeof(float)){
             return minmax_contiguous(a - length + 1, length);
         }
-        char* a_bytes = (char*)a;
-        minmax_avx_strided(a_bytes + (length)*stride, length-2, -stride);
+        if (length < 16){
+            return minmax_pairwise_strided((char*)(a) + (length - 1)*stride, length, -stride);
+        } else {
+            return minmax_avx_strided((char*)(a) + (length - 1)*stride, length, -stride);
+        }
     }
-    // return minmax_pairwise_strided(a, length, stride/sizeof(float));
+    if (length < 16){
+        return minmax_pairwise_strided((char*)a, length, stride);
+    }
     return minmax_avx_strided((char*)a, length, stride);
 }
