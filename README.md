@@ -1,10 +1,10 @@
 # numpy-minmax: a fast function for finding the minimum and maximum value in a NumPy array
 
-NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we use it for audio processing, but it can also be applied to other kinds of data of similar shape.
+NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we use it for audio processing, but it can be applied any kind of float32 ndarray.
 
 * Written in C and takes advantage of AVX2 for speed
-* Roughly **2.3x speedup** compared to the numpy amin+amax equivalent (tested with numpy 1.24-1.26)
-* The fast implementation is tailored for C-contiguous 1-dimensional and 2-dimensional float32 arrays. Other types of arrays get processed with numpy.amin and numpy.amax, so no perf gain there.
+* Roughly **2.3x speedup** compared to the numpy amin+amax equivalent (tested on Intel CPU with numpy 1.24-1.26)
+* The fast implementation is tailored for float32 arrays that are C-contiguous and/or F-contiguous. Other types of arrays get processed with numpy.amin and numpy.amax, so no perf gain there.
 
 # Installation
 
