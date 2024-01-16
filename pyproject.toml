@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "numpy-minmax"
-version = "0.1.1"
+version = "0.2.0"
 description = "A fast python library for finding both min and max value in a NumPy array"
 dependencies = [
     "numpy>=1.21"
