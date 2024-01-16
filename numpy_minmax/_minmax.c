@@ -72,7 +72,7 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
 
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is char
-MinMaxResult minmax_pairwise_strided(char *a, size_t length, long stride) {
+MinMaxResult minmax_pairwise_strided(const char *a, size_t length, long stride) {
     MinMaxResult result;
 
     // Initialize min and max with the last element of the array.
@@ -104,7 +104,7 @@ MinMaxResult minmax_pairwise_strided(char *a, size_t length, long stride) {
 
 // Takes the avx min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is char
-MinMaxResult minmax_avx_strided(char *a, size_t length, long stride) {
+MinMaxResult minmax_avx_strided(const char *a, size_t length, long stride) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     __m256 min_vals = _mm256_set_ps(
@@ -145,7 +145,7 @@ MinMaxResult minmax_avx_strided(char *a, size_t length, long stride) {
 }
 
 
-MinMaxResult minmax_1d_strided(float *a, size_t length, long stride) {
+MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
     // Return early for empty arrays
     if (length == 0) {
         return (MinMaxResult){0.0, 0.0};
