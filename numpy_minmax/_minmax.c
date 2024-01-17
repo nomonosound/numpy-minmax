@@ -136,9 +136,10 @@ MinMaxResult minmax_avx_strided(const char *a, size_t length, long stride) {
         max_vals = _mm256_max_ps(max_vals, vals);
     }
 
+
     // Process remainder elements
-    if (i < length){
-        result = minmax_pairwise_strided(a + i*stride, length - i, stride);
+    if (i < length*stride){
+        result = minmax_pairwise_strided(a + i, length - i / stride, stride);
     }
 
     return reduce_result_from_mm256(min_vals, max_vals, result);
