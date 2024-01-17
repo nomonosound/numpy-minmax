@@ -1,27 +1,15 @@
 #include <immintrin.h>
 #include <float.h>
 
-#define REDUCE_RESULT_FROM_MM256(min_vals, max_vals, result) ({\
-    float temp_min[8], temp_max[8]; \
-    _mm256_storeu_ps(temp_min, min_vals); \
-    _mm256_storeu_ps(temp_max, max_vals); \
-    for (i = 0; i < 8; ++i) { \
-        if (temp_min[i] < result.min_val) result.min_val = temp_min[i]; \
-        if (temp_max[i] > result.max_val) result.max_val = temp_max[i]; \
-}})
-
 typedef struct {
     float min_val;
     float max_val;
 } MinMaxResult;
 
-MinMaxResult minmax_pairwise(float *a, size_t length) {
-    MinMaxResult result;
-
+static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
     // Initialize min and max with the last element of the array.
     // This ensures that it works correctly for odd length arrays as well as even.
-    result.min_val = a[length-1];
-    result.max_val = result.min_val;
+    MinMaxResult result = {.min_val = a[length -1], .max_val = a[length-1]};
 
     // Process elements in pairs
     for (size_t i = 0; i < length - 1; i += 2) {
@@ -35,12 +23,21 @@ MinMaxResult minmax_pairwise(float *a, size_t length) {
             result.max_val = larger;
         }
     }
-
     return result;
 }
 
+static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_vals, MinMaxResult result) {
+    float temp_min[8], temp_max[8];
+    _mm256_storeu_ps(temp_min, min_vals);
+    _mm256_storeu_ps(temp_max, max_vals);
+    for (size_t i = 0; i < 8; ++i) {
+        if (temp_min[i] < result.min_val) result.min_val = temp_min[i];
+        if (temp_max[i] > result.max_val) result.max_val = temp_max[i];
+    }
+    return result;
+}
 
-MinMaxResult minmax_avx(float *a, size_t length) {
+MinMaxResult minmax_avx(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     __m256 min_vals = _mm256_loadu_ps(a);
@@ -53,19 +50,15 @@ MinMaxResult minmax_avx(float *a, size_t length) {
         min_vals = _mm256_min_ps(min_vals, vals);
         max_vals = _mm256_max_ps(max_vals, vals);
     }
-
     // Process remainder elements
-    for (; i < length; ++i) {
-        if (a[i] < result.min_val) result.min_val = a[i];
-        if (a[i] > result.max_val) result.max_val = a[i];
+    if (i < length){
+        result = minmax_pairwise(a + i, length - i);
     }
 
-    REDUCE_RESULT_FROM_MM256(min_vals, max_vals, result);
-
-    return result;
+    return reduce_result_from_mm256(min_vals, max_vals, result);
 }
 
-MinMaxResult minmax_contiguous(float *a, size_t length) {
+MinMaxResult minmax_contiguous(const float *a, size_t length) {
     // Return early for empty arrays
     if (length == 0) {
         return (MinMaxResult){0.0, 0.0};
@@ -79,7 +72,7 @@ MinMaxResult minmax_contiguous(float *a, size_t length) {
 
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is char
-MinMaxResult minmax_pairwise_strided(char *a, size_t length, long stride) {
+MinMaxResult minmax_pairwise_strided(const char *a, size_t length, long stride) {
     MinMaxResult result;
 
     // Initialize min and max with the last element of the array.
@@ -111,7 +104,7 @@ MinMaxResult minmax_pairwise_strided(char *a, size_t length, long stride) {
 
 // Takes the avx min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is char
-MinMaxResult minmax_avx_strided(char *a, size_t length, long stride) {
+MinMaxResult minmax_avx_strided(const char *a, size_t length, long stride) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     __m256 min_vals = _mm256_set_ps(
@@ -144,18 +137,15 @@ MinMaxResult minmax_avx_strided(char *a, size_t length, long stride) {
     }
 
     // Process remainder elements
-    for (; i < length*stride; i+=stride) {
-        if (*(float*)(a + i) < result.min_val) result.min_val = *(float*)(a + i);
-        if (*(float*)(a + i) > result.max_val) result.max_val = *(float*)(a + i);
+    if (i < length){
+        result = minmax_pairwise_strided(a + i*stride, length - i, stride);
     }
 
-    REDUCE_RESULT_FROM_MM256(min_vals, max_vals, result);
-
-    return result;
+    return reduce_result_from_mm256(min_vals, max_vals, result);
 }
 
 
-MinMaxResult minmax_1d_strided(float *a, size_t length, long stride) {
+MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
     // Return early for empty arrays
     if (length == 0) {
         return (MinMaxResult){0.0, 0.0};
