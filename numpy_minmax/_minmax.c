@@ -6,6 +6,8 @@ typedef struct {
     float max_val;
 } MinMaxResult;
 
+typedef unsigned char Byte;
+
 static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
     // Initialize min and max with the last element of the array.
     // This ensures that it works correctly for odd length arrays as well as even.
@@ -71,8 +73,8 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
 }
 
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
-// which is why the data pointer is char
-MinMaxResult minmax_pairwise_strided(const char *a, size_t length, long stride) {
+// which is why the data pointer is Byte (i.e. unsigned char)
+MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) {
     MinMaxResult result;
 
     // Initialize min and max with the last element of the array.
@@ -103,10 +105,11 @@ MinMaxResult minmax_pairwise_strided(const char *a, size_t length, long stride) 
 }
 
 // Takes the avx min/max on strided input. Strides are in number of bytes,
-// which is why the data pointer is char
-MinMaxResult minmax_avx_strided(const char *a, size_t length, long stride) {
+// which is why the data pointer is Byte (i.e. unsigned char)
+MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
+    // This is faster than intrinsic gather on tested platforms
     __m256 min_vals = _mm256_set_ps(
         *(float*)(a),
         *(float*)(a + stride),
@@ -156,13 +159,13 @@ MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
             return minmax_contiguous(a - length + 1, length);
         }
         if (length < 16){
-            return minmax_pairwise_strided((char*)(a) + (length - 1)*stride, length, -stride);
-        } else {
-            return minmax_avx_strided((char*)(a) + (length - 1)*stride, length, -stride);
+            return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
         }
+        return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+
     }
     if (length < 16){
-        return minmax_pairwise_strided((char*)a, length, stride);
+        return minmax_pairwise_strided((Byte*)a, length, stride);
     }
-    return minmax_avx_strided((char*)a, length, stride);
+    return minmax_avx_strided((Byte*)a, length, stride);
 }
