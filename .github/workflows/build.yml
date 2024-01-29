@@ -29,6 +29,7 @@ jobs:
         env:
           CIBW_ARCHS: "auto64"
           CIBW_SKIP: "cp36-* cp37-* pp37-* pp310-*"
+          CC: clang
         run: |
           python -m cibuildwheel --output-dir wheelhouse
       - name: Save Wheels
