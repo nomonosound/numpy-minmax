@@ -33,7 +33,7 @@ See [CHANGELOG.md](CHANGELOG.md)
 
 # Development
 
-* Install dev/build/test dependencies as denoted in setup.py
+* Install dev/build/test dependencies as denoted in pyproject.toml
 * `CC=clang pip install -e .`
 * `pytest`
 
