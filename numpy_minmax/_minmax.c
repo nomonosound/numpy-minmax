@@ -17,7 +17,7 @@ bool system_supports_avx512() {
     __cpuid_count(7, 0, eax, ebx, ecx, edx);
 
     // Check the AVX512F bit (bit 16 of EBX)
-    return (ebx & (1 << 16)) != 0;
+    return (ebx & bit_AVX512F) != 0;
 }
 
 static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
