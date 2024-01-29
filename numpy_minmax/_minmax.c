@@ -1,7 +1,16 @@
-#include <cpuid.h>
 #include <float.h>
 #include <immintrin.h>
 #include <stdbool.h>
+
+#ifdef _MSC_VER
+    #include <intrin.h>  // MSVC
+#else
+    #include <cpuid.h>  // GCC and Clang
+#endif
+
+#ifndef bit_AVX512F
+#define bit_AVX512F     (1 << 16)
+#endif
 
 typedef struct {
     float min_val;
@@ -14,9 +23,17 @@ bool system_supports_avx512() {
     unsigned int eax, ebx, ecx, edx;
 
     // EAX=7, ECX=0: Extended Features
-    __cpuid_count(7, 0, eax, ebx, ecx, edx);
+    #ifdef _MSC_VER
+        // MSVC
+        int cpuInfo[4];
+        __cpuid(cpuInfo, 7);
+        ebx = cpuInfo[1];
+    #else
+        // GCC, Clang
+        __cpuid(7, eax, ebx, ecx, edx);
+    #endif
 
-    // Check the AVX512F bit (bit 16 of EBX)
+    // Check the AVX512F bit in EBX
     return (ebx & bit_AVX512F) != 0;
 }
 
