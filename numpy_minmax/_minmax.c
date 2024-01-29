@@ -1,5 +1,7 @@
-#include <immintrin.h>
+#include <cpuid.h>
 #include <float.h>
+#include <immintrin.h>
+#include <stdbool.h>
 
 typedef struct {
     float min_val;
@@ -7,6 +9,16 @@ typedef struct {
 } MinMaxResult;
 
 typedef unsigned char Byte;
+
+bool system_supports_avx512() {
+    unsigned int eax, ebx, ecx, edx;
+
+    // EAX=7, ECX=0: Extended Features
+    __cpuid_count(7, 0, eax, ebx, ecx, edx);
+
+    // Check the AVX512F bit (bit 16 of EBX)
+    return (ebx & (1 << 16)) != 0;
+}
 
 static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
     // Initialize min and max with the last element of the array.
@@ -53,11 +65,44 @@ MinMaxResult minmax_avx(const float *a, size_t length) {
         max_vals = _mm256_max_ps(max_vals, vals);
     }
     // Process remainder elements
-    if (i < length){
+    if (i < length) {
         result = minmax_pairwise(a + i, length - i);
     }
 
     return reduce_result_from_mm256(min_vals, max_vals, result);
+}
+
+static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_vals, MinMaxResult result) {
+    float temp_min[16], temp_max[16];
+    _mm512_storeu_ps(temp_min, min_vals);
+    _mm512_storeu_ps(temp_max, max_vals);
+    for (size_t i = 0; i < 16; ++i) {
+        if (temp_min[i] < result.min_val) result.min_val = temp_min[i];
+        if (temp_max[i] > result.max_val) result.max_val = temp_max[i];
+    }
+    return result;
+}
+
+MinMaxResult minmax_avx512(const float *a, size_t length) {
+    MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
+
+    __m512 min_vals = _mm512_loadu_ps(a);
+    __m512 max_vals = min_vals;
+
+    // Process elements in chunks of sixteen
+    size_t i = 16;
+    for (; i <= length - 16; i += 16) {
+        __m512 vals = _mm512_loadu_ps(a + i);
+        min_vals = _mm512_min_ps(min_vals, vals);
+        max_vals = _mm512_max_ps(max_vals, vals);
+    }
+
+    // Process remainder elements
+    if (i < length) {
+        result = minmax_pairwise(a + i, length - i);
+    }
+
+    return reduce_result_from_mm512(min_vals, max_vals, result);
 }
 
 MinMaxResult minmax_contiguous(const float *a, size_t length) {
@@ -66,7 +111,11 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
         return (MinMaxResult){0.0, 0.0};
     }
     if (length >= 16) {
-        return minmax_avx(a, length);
+        if (system_supports_avx512()) {
+            return minmax_avx512(a, length);
+        } else {
+            return minmax_avx(a, length);
+        }
     } else {
         return minmax_pairwise(a, length);
     }
