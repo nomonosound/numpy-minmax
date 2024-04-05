@@ -2,7 +2,7 @@
 
 NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we use it for audio processing, but it can be applied any kind of float32 ndarray.
 
-* Written in C and takes advantage of AVX for speed
+* Written in C and takes advantage of AVX/AVX512 for speed
 * Roughly **2.3x speedup** compared to the numpy amin+amax equivalent (tested on Intel CPU with numpy 1.24-1.26)
 * The fast implementation is tailored for float32 arrays that are C-contiguous, F-contiguous or 1D strided. Strided arrays with ndim >= 2 get processed with numpy.amin and numpy.amax, so no perf gain there.
 
