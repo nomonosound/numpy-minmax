@@ -45,6 +45,22 @@ class TestMinMax:
         assert isinstance(min_val, np.float32)
         assert isinstance(max_val, np.float32)
 
+    def test_minmax_999_positive_values(self):
+        arr = np.arange(999, dtype=np.float32) + 5.0
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == 5.0
+        assert max_val == 998.0 + 5.0
+        assert isinstance(min_val, np.float32)
+        assert isinstance(max_val, np.float32)
+
+    def test_minmax_4_positive_values(self):
+        arr = np.arange(4, dtype=np.float32) + 5.0
+        min_val, max_val = numpy_minmax.minmax(arr)
+        assert min_val == 5.0
+        assert max_val == 3.0 + 5.0
+        assert isinstance(min_val, np.float32)
+        assert isinstance(max_val, np.float32)
+
     def test_minmax_float64_numpy_fallback(self):
         arr = np.arange(17, dtype=np.float64)
         min_val, max_val = numpy_minmax.minmax(arr)
