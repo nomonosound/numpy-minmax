@@ -1,6 +1,6 @@
 * Bump version in `pyproject.toml`
 * `CC=clang pip install -e . && pytest`
-* Update CHANGELOG.md
+* Update CHANGELOG.md and insert only the changelog for the latest version in README.md
 * Commit and push the change with a commit message like this: "Release vx.y.z" (replace x.y.z with the package version)
 * Wait for build workflow in GitHub Actions to complete
 * Download wheels artifact from the build workflow

@@ -29,7 +29,12 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 
 # Changelog
 
-See [CHANGELOG.md](CHANGELOG.md)
+## [0.2.1] - 2024-03-12
+
+* Add support for AVX512. It will only be used if the CPU reports that it supports it.
+* Compile builds for linux with clang instead of gcc, as this seems to yield tiny performance improvements
+
+For the complete changelog, go to [CHANGELOG.md](CHANGELOG.md)
 
 # Development
 
