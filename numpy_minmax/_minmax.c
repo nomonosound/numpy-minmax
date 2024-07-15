@@ -1,6 +1,9 @@
 #include <float.h>
-#include <immintrin.h>
 #include <stdbool.h>
+
+#if defined(__x86_64__) || defined(_M_X64)
+#include <immintrin.h>
+#endif
 
 #ifdef _MSC_VER
     #include <intrin.h>  // MSVC
@@ -127,15 +130,20 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
     if (length == 0) {
         return (MinMaxResult){0.0, 0.0};
     }
-    if (length >= 16) {
-        if (system_supports_avx512()) {
-            return minmax_avx512(a, length);
+
+    #if defined(__x86_64__) || defined(_M_X64)
+        if (length >= 16) {
+            if (system_supports_avx512()) {
+                return minmax_avx512(a, length);
+            } else {
+                return minmax_avx(a, length);
+            }
         } else {
-            return minmax_avx(a, length);
+            return minmax_pairwise(a, length);
         }
-    } else {
+    #else
         return minmax_pairwise(a, length);
-    }
+    #endif
 }
 
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
@@ -220,18 +228,23 @@ MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
     if (length == 0) {
         return (MinMaxResult){0.0, 0.0};
     }
-    if (stride < 0){
-        if (-stride == sizeof(float)){
-            return minmax_contiguous(a - length + 1, length);
+
+    #if defined(__x86_64__) || defined(_M_X64)
+        if (stride < 0){
+            if (-stride == sizeof(float)){
+                return minmax_contiguous(a - length + 1, length);
+            }
+            if (length < 16){
+                return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+            }
+            return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+
         }
         if (length < 16){
-            return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+            return minmax_pairwise_strided((Byte*)a, length, stride);
         }
-        return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
-
-    }
-    if (length < 16){
+        return minmax_avx_strided((Byte*)a, length, stride);
+    #else
         return minmax_pairwise_strided((Byte*)a, length, stride);
-    }
-    return minmax_avx_strided((Byte*)a, length, stride);
+    #endif
 }
