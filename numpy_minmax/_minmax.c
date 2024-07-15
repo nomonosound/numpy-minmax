@@ -23,6 +23,7 @@ typedef struct {
 
 typedef unsigned char Byte;
 
+#if defined(__x86_64__) || defined(_M_X64)
 bool system_supports_avx512() {
     unsigned int eax, ebx, ecx, edx;
 
@@ -40,6 +41,7 @@ bool system_supports_avx512() {
     // Check the AVX512F bit in EBX
     return (ebx & bit_AVX512F) != 0;
 }
+#endif
 
 static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
     // Initialize min and max with the last element of the array.
@@ -61,6 +63,7 @@ static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
     return result;
 }
 
+#if defined(__x86_64__) || defined(_M_X64)
 static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_vals, MinMaxResult result) {
     float temp_min[8], temp_max[8];
     _mm256_storeu_ps(temp_min, min_vals);
@@ -71,6 +74,7 @@ static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_
     }
     return result;
 }
+
 
 MinMaxResult minmax_avx(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
@@ -125,6 +129,7 @@ MinMaxResult minmax_avx512(const float *a, size_t length) {
 
     return reduce_result_from_mm512(min_vals, max_vals, result);
 }
+#endif
 
 MinMaxResult minmax_contiguous(const float *a, size_t length) {
     // Return early for empty arrays
@@ -147,6 +152,7 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
     #endif
 }
 
+#if defined(__x86_64__) || defined(_M_X64)
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is Byte (i.e. unsigned char)
 MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) {
@@ -222,6 +228,7 @@ MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
 
     return reduce_result_from_mm256(min_vals, max_vals, result);
 }
+#endif
 
 
 MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
