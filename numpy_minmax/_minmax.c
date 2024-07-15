@@ -2,18 +2,19 @@
 #include <stdbool.h>
 
 #if defined(__x86_64__) || defined(_M_X64)
-#include <immintrin.h>
+    #include <immintrin.h>
+
+    #ifdef _MSC_VER
+        #include <intrin.h>  // MSVC
+    #else
+        #include <cpuid.h>  // GCC and Clang
+    #endif
+
+    #ifndef bit_AVX512F
+    #define bit_AVX512F     (1 << 16)
+    #endif
 #endif
 
-#ifdef _MSC_VER
-    #include <intrin.h>  // MSVC
-#else
-    #include <cpuid.h>  // GCC and Clang
-#endif
-
-#ifndef bit_AVX512F
-#define bit_AVX512F     (1 << 16)
-#endif
 
 typedef struct {
     float min_val;
