@@ -1,7 +1,9 @@
 #include <float.h>
 #include <stdbool.h>
 
-#if defined(__x86_64__) || defined(_M_X64)
+#define IS_X86_64 (defined(__x86_64__) || defined(_M_X64))
+
+#if IS_X86_64
     #include <immintrin.h>
 
     #ifdef _MSC_VER
@@ -23,7 +25,7 @@ typedef struct {
 
 typedef unsigned char Byte;
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if IS_X86_64
 bool system_supports_avx512() {
     unsigned int eax, ebx, ecx, edx;
 
@@ -63,7 +65,7 @@ static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
     return result;
 }
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if IS_X86_64
 static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_vals, MinMaxResult result) {
     float temp_min[8], temp_max[8];
     _mm256_storeu_ps(temp_min, min_vals);
@@ -76,7 +78,7 @@ static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_
 }
 #endif
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if IS_X86_64
 MinMaxResult minmax_avx(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
@@ -99,7 +101,7 @@ MinMaxResult minmax_avx(const float *a, size_t length) {
 }
 #endif
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if IS_X86_64
 static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_vals, MinMaxResult result) {
     float temp_min[16], temp_max[16];
     _mm512_storeu_ps(temp_min, min_vals);
@@ -112,7 +114,7 @@ static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_
 }
 #endif
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if IS_X86_64
 MinMaxResult minmax_avx512(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
@@ -142,7 +144,7 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
         return (MinMaxResult){0.0, 0.0};
     }
 
-    #if defined(__x86_64__) || defined(_M_X64)
+    #if IS_X86_64
         if (length >= 16) {
             if (system_supports_avx512()) {
                 return minmax_avx512(a, length);
@@ -189,7 +191,7 @@ MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) 
     return result;
 }
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if IS_X86_64
 // Takes the avx min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is Byte (i.e. unsigned char)
 MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
@@ -248,14 +250,14 @@ MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
         if (length < 16){
             return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
         }
-        #if defined(__x86_64__) || defined(_M_X64)
+        #if IS_X86_64
             return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
         #else
             return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
         #endif
     }
 
-    #if defined(__x86_64__) || defined(_M_X64)
+    #if IS_X86_64
         if (length < 16){
             return minmax_pairwise_strided((Byte*)a, length, stride);
         }
