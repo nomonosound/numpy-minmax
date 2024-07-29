@@ -144,19 +144,19 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
         return (MinMaxResult){0.0, 0.0};
     }
 
-    #if IS_X86_64
-        if (length >= 16) {
-            if (system_supports_avx512()) {
-                return minmax_avx512(a, length);
-            } else {
-                return minmax_avx(a, length);
-            }
+#if IS_X86_64
+    if (length >= 16) {
+        if (system_supports_avx512()) {
+            return minmax_avx512(a, length);
         } else {
-            return minmax_pairwise(a, length);
+            return minmax_avx(a, length);
         }
-    #else
+    } else {
         return minmax_pairwise(a, length);
-    #endif
+    }
+#else
+    return minmax_pairwise(a, length);
+#endif
 }
 
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
@@ -250,19 +250,19 @@ MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
         if (length < 16){
             return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
         }
-        #if IS_X86_64
-            return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
-        #else
-            return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
-        #endif
+#if IS_X86_64
+        return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+#else
+        return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+#endif
     }
 
-    #if IS_X86_64
-        if (length < 16){
-            return minmax_pairwise_strided((Byte*)a, length, stride);
-        }
-        return minmax_avx_strided((Byte*)a, length, stride);
-    #else
+#if IS_X86_64
+    if (length < 16){
         return minmax_pairwise_strided((Byte*)a, length, stride);
-    #endif
+    }
+    return minmax_avx_strided((Byte*)a, length, stride);
+#else
+    return minmax_pairwise_strided((Byte*)a, length, stride);
+#endif
 }
