@@ -76,9 +76,7 @@ static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_
     }
     return result;
 }
-#endif
 
-#if IS_X86_64
 MinMaxResult minmax_avx(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
@@ -99,9 +97,7 @@ MinMaxResult minmax_avx(const float *a, size_t length) {
 
     return reduce_result_from_mm256(min_vals, max_vals, result);
 }
-#endif
 
-#if IS_X86_64
 static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_vals, MinMaxResult result) {
     float temp_min[16], temp_max[16];
     _mm512_storeu_ps(temp_min, min_vals);
@@ -112,9 +108,7 @@ static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_
     }
     return result;
 }
-#endif
 
-#if IS_X86_64
 MinMaxResult minmax_avx512(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
