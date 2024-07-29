@@ -74,8 +74,9 @@ static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_
     }
     return result;
 }
+#endif
 
-
+#if defined(__x86_64__) || defined(_M_X64)
 MinMaxResult minmax_avx(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
@@ -96,7 +97,9 @@ MinMaxResult minmax_avx(const float *a, size_t length) {
 
     return reduce_result_from_mm256(min_vals, max_vals, result);
 }
+#endif
 
+#if defined(__x86_64__) || defined(_M_X64)
 static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_vals, MinMaxResult result) {
     float temp_min[16], temp_max[16];
     _mm512_storeu_ps(temp_min, min_vals);
@@ -107,7 +110,9 @@ static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_
     }
     return result;
 }
+#endif
 
+#if defined(__x86_64__) || defined(_M_X64)
 MinMaxResult minmax_avx512(const float *a, size_t length) {
     MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
@@ -152,7 +157,6 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
     #endif
 }
 
-#if defined(__x86_64__) || defined(_M_X64)
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is Byte (i.e. unsigned char)
 MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) {
@@ -185,6 +189,7 @@ MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) 
     return result;
 }
 
+#if defined(__x86_64__) || defined(_M_X64)
 // Takes the avx min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is Byte (i.e. unsigned char)
 MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
@@ -219,7 +224,6 @@ MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
         min_vals = _mm256_min_ps(min_vals, vals);
         max_vals = _mm256_max_ps(max_vals, vals);
     }
-
 
     // Process remainder elements
     if (i < length*stride){
