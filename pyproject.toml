@@ -7,7 +7,8 @@ name = "numpy-minmax"
 version = "0.2.1"
 description = "A fast python library for finding both min and max value in a NumPy array"
 dependencies = [
-    "numpy>=1.21"
+    "cffi>=1.0.0",
+    "numpy>=1.21,<2"
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
