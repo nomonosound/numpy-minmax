@@ -241,17 +241,21 @@ MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
         return (MinMaxResult){0.0, 0.0};
     }
 
-    #if defined(__x86_64__) || defined(_M_X64)
-        if (stride < 0){
-            if (-stride == sizeof(float)){
-                return minmax_contiguous(a - length + 1, length);
-            }
-            if (length < 16){
-                return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
-            }
-            return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
-
+    if (stride < 0){
+        if (-stride == sizeof(float)){
+            return minmax_contiguous(a - length + 1, length);
         }
+        if (length < 16){
+            return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+        }
+        #if defined(__x86_64__) || defined(_M_X64)
+            return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+        #else
+            return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+        #endif
+    }
+
+    #if defined(__x86_64__) || defined(_M_X64)
         if (length < 16){
             return minmax_pairwise_strided((Byte*)a, length, stride);
         }
