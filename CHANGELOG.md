@@ -3,7 +3,20 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2024-07-29
+
+### Added
+
+* Distribute source
+
+### Changes
+
+* Add support for ARM (without NEON optimizations for now) on Linux and macOS
+* Update supported numpy version range to >=1.21,<2 
+
 ## [0.2.1] - 2024-03-12
+
+### Changes
 
 * Add support for AVX512. It will only be used if the CPU reports that it supports it.
 * Compile builds for linux with clang instead of gcc, as this seems to yield tiny performance improvements

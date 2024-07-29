@@ -10,8 +10,7 @@ NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we us
 
 [![PyPI version](https://img.shields.io/pypi/v/numpy-minmax.svg?style=flat)](https://pypi.org/project/numpy-minmax/)
 ![python 3.8, 3.9, 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11|%203.12-blue)
-![os: Linux, Windows](https://img.shields.io/badge/OS-Linux%20|%20Windows-blue)
-![CPU: x86_84](https://img.shields.io/badge/CPU-x86__64-blue)
+![os: Linux, macOS, Windows](https://img.shields.io/badge/OS-Linux%20%28arm%20%26%20x86%29%20|%20macOS%20%28arm%29%20|%20Windows%20%28x86%29-blue)
 
 ```
 $ pip install numpy-minmax
@@ -29,10 +28,16 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 
 # Changelog
 
-## [0.2.1] - 2024-03-12
+## [0.3.0] - 2024-07-29
 
-* Add support for AVX512. It will only be used if the CPU reports that it supports it.
-* Compile builds for linux with clang instead of gcc, as this seems to yield tiny performance improvements
+### Added
+
+* Distribute source
+
+### Changes
+
+* Add support for ARM (without NEON optimizations for now) on Linux and macOS
+* Update supported numpy version range to >=1.21,<2
 
 For the complete changelog, go to [CHANGELOG.md](CHANGELOG.md)
 
