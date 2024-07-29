@@ -25,6 +25,7 @@ if os.name == "posix":
 # Detect architecture and set appropriate SIMD-related compile args
 if platform.machine().lower() in ["x86_64", "amd64", "i386", "i686"]:
     extra_compile_args.append("-mavx")
+    extra_compile_args.append("-mavx512f")
 
 ffibuilder.set_source("_numpy_minmax", c_code, extra_compile_args=extra_compile_args)
 
