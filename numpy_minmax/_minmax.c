@@ -146,11 +146,15 @@ MinMaxResult minmax_contiguous(const float *a, size_t length) {
 
 #if IS_X86_64
     if (length >= 16) {
+    #if defined(__APPLE__) && defined(__MACH__)
+        return minmax_avx(a, length);
+    #else
         if (system_supports_avx512()) {
             return minmax_avx512(a, length);
         } else {
             return minmax_avx(a, length);
         }
+    #endif
     } else {
         return minmax_pairwise(a, length);
     }
