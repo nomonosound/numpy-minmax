@@ -7,10 +7,10 @@ ffibuilder.cdef("""
     typedef struct {
         float min_val;
         float max_val;
-    } MinMaxResult;
+    } minmax_result_float32;
 """)
-ffibuilder.cdef("MinMaxResult minmax_contiguous(float *, size_t);")
-ffibuilder.cdef("MinMaxResult minmax_1d_strided(float *, size_t, long);")
+ffibuilder.cdef("minmax_result_float32 minmax_contiguous_float32(float *, size_t);")
+ffibuilder.cdef("minmax_result_float32 minmax_1d_strided_float32(float *, size_t, long);")
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 c_file_path = os.path.join(script_dir, "_minmax.c")
