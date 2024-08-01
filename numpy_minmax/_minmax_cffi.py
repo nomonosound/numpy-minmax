@@ -5,10 +5,17 @@ from cffi import FFI
 ffibuilder = FFI()
 ffibuilder.cdef("""
     typedef struct {
+        int16_t min_val;
+        int16_t max_val;
+    } minmax_result_int16;
+""")
+ffibuilder.cdef("""
+    typedef struct {
         float min_val;
         float max_val;
     } minmax_result_float32;
 """)
+ffibuilder.cdef("minmax_result_int16 minmax_contiguous_int16(int16_t *, size_t);")
 ffibuilder.cdef("minmax_result_float32 minmax_contiguous_float32(float *, size_t);")
 ffibuilder.cdef("minmax_result_float32 minmax_1d_strided_float32(float *, size_t, long);")
 
