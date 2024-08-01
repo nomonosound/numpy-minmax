@@ -21,7 +21,7 @@
 typedef struct {
     float min_val;
     float max_val;
-} MinMaxResult;
+} minmax_result_float32;
 
 typedef unsigned char Byte;
 
@@ -45,10 +45,10 @@ bool system_supports_avx512() {
 }
 #endif
 
-static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
+static inline minmax_result_float32 minmax_pairwise_float32(const float *a, size_t length) {
     // Initialize min and max with the last element of the array.
     // This ensures that it works correctly for odd length arrays as well as even.
-    MinMaxResult result = {.min_val = a[length -1], .max_val = a[length-1]};
+    minmax_result_float32 result = {.min_val = a[length -1], .max_val = a[length-1]};
 
     // Process elements in pairs
     for (size_t i = 0; i < length - 1; i += 2) {
@@ -66,7 +66,7 @@ static inline MinMaxResult minmax_pairwise(const float *a, size_t length) {
 }
 
 #if IS_X86_64
-static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_vals, MinMaxResult result) {
+static inline minmax_result_float32 reduce_result_from_mm256_float32(__m256 min_vals, __m256 max_vals, minmax_result_float32 result) {
     float temp_min[8], temp_max[8];
     _mm256_storeu_ps(temp_min, min_vals);
     _mm256_storeu_ps(temp_max, max_vals);
@@ -77,8 +77,8 @@ static inline MinMaxResult reduce_result_from_mm256(__m256 min_vals, __m256 max_
     return result;
 }
 
-MinMaxResult minmax_avx(const float *a, size_t length) {
-    MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
+minmax_result_float32 minmax_avx_float32(const float *a, size_t length) {
+    minmax_result_float32 result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     __m256 min_vals = _mm256_loadu_ps(a);
     __m256 max_vals = min_vals;
@@ -92,13 +92,13 @@ MinMaxResult minmax_avx(const float *a, size_t length) {
     }
     // Process remainder elements
     if (i < length) {
-        result = minmax_pairwise(a + i, length - i);
+        result = minmax_pairwise_float32(a + i, length - i);
     }
 
-    return reduce_result_from_mm256(min_vals, max_vals, result);
+    return reduce_result_from_mm256_float32(min_vals, max_vals, result);
 }
 
-static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_vals, MinMaxResult result) {
+static inline minmax_result_float32 reduce_result_from_mm512_float32(__m512 min_vals, __m512 max_vals, minmax_result_float32 result) {
     float temp_min[16], temp_max[16];
     _mm512_storeu_ps(temp_min, min_vals);
     _mm512_storeu_ps(temp_max, max_vals);
@@ -109,8 +109,8 @@ static inline MinMaxResult reduce_result_from_mm512(__m512 min_vals, __m512 max_
     return result;
 }
 
-MinMaxResult minmax_avx512(const float *a, size_t length) {
-    MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
+minmax_result_float32 minmax_avx512_float32(const float *a, size_t length) {
+    minmax_result_float32 result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     __m512 min_vals = _mm512_loadu_ps(a);
     __m512 max_vals = min_vals;
@@ -125,38 +125,38 @@ MinMaxResult minmax_avx512(const float *a, size_t length) {
 
     // Process remainder elements
     if (i < length) {
-        result = minmax_pairwise(a + i, length - i);
+        result = minmax_pairwise_float32(a + i, length - i);
     }
 
-    return reduce_result_from_mm512(min_vals, max_vals, result);
+    return reduce_result_from_mm512_float32(min_vals, max_vals, result);
 }
 #endif
 
-MinMaxResult minmax_contiguous(const float *a, size_t length) {
+minmax_result_float32 minmax_contiguous_float32(const float *a, size_t length) {
     // Return early for empty arrays
     if (length == 0) {
-        return (MinMaxResult){0.0, 0.0};
+        return (minmax_result_float32){0.0, 0.0};
     }
 
 #if IS_X86_64
     if (length >= 16) {
         if (system_supports_avx512()) {
-            return minmax_avx512(a, length);
+            return minmax_avx512_float32(a, length);
         } else {
-            return minmax_avx(a, length);
+            return minmax_avx_float32(a, length);
         }
     } else {
-        return minmax_pairwise(a, length);
+        return minmax_pairwise_float32(a, length);
     }
 #else
-    return minmax_pairwise(a, length);
+    return minmax_pairwise_float32(a, length);
 #endif
 }
 
 // Takes the pairwise min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is Byte (i.e. unsigned char)
-MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) {
-    MinMaxResult result;
+minmax_result_float32 minmax_pairwise_strided_float32(const Byte *a, size_t length, long stride) {
+    minmax_result_float32 result;
 
     // Initialize min and max with the last element of the array.
     // This ensures that it works correctly for odd length arrays as well as even.
@@ -188,8 +188,8 @@ MinMaxResult minmax_pairwise_strided(const Byte *a, size_t length, long stride) 
 #if IS_X86_64
 // Takes the avx min/max on strided input. Strides are in number of bytes,
 // which is why the data pointer is Byte (i.e. unsigned char)
-MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
-    MinMaxResult result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
+minmax_result_float32 minmax_avx_strided_float32(const Byte *a, size_t length, long stride) {
+    minmax_result_float32 result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     // This is faster than intrinsic gather on tested platforms
     __m256 min_vals = _mm256_set_ps(
@@ -223,40 +223,40 @@ MinMaxResult minmax_avx_strided(const Byte *a, size_t length, long stride) {
 
     // Process remainder elements
     if (i < length*stride){
-        result = minmax_pairwise_strided(a + i, length - i / stride, stride);
+        result = minmax_pairwise_strided_float32(a + i, length - i / stride, stride);
     }
 
-    return reduce_result_from_mm256(min_vals, max_vals, result);
+    return reduce_result_from_mm256_float32(min_vals, max_vals, result);
 }
 #endif
 
 
-MinMaxResult minmax_1d_strided(const float *a, size_t length, long stride) {
+minmax_result_float32 minmax_1d_strided_float32(const float *a, size_t length, long stride) {
     // Return early for empty arrays
     if (length == 0) {
-        return (MinMaxResult){0.0, 0.0};
+        return (minmax_result_float32){0.0, 0.0};
     }
 
     if (stride < 0){
         if (-stride == sizeof(float)){
-            return minmax_contiguous(a - length + 1, length);
+            return minmax_contiguous_float32(a - length + 1, length);
         }
         if (length < 16){
-            return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+            return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
         }
 #if IS_X86_64
-        return minmax_avx_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+        return minmax_avx_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
 #else
-        return minmax_pairwise_strided((Byte*)(a) + (length - 1)*stride, length, -stride);
+        return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
 #endif
     }
 
 #if IS_X86_64
     if (length < 16){
-        return minmax_pairwise_strided((Byte*)a, length, stride);
+        return minmax_pairwise_strided_float32((Byte*)a, length, stride);
     }
-    return minmax_avx_strided((Byte*)a, length, stride);
+    return minmax_avx_strided_float32((Byte*)a, length, stride);
 #else
-    return minmax_pairwise_strided((Byte*)a, length, stride);
+    return minmax_pairwise_strided_float32((Byte*)a, length, stride);
 #endif
 }
