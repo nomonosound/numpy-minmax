@@ -23,6 +23,12 @@ typedef struct {
     float max_val;
 } minmax_result_float32;
 
+typedef struct {
+    int16_t min_val;
+    int16_t max_val;
+} minmax_result_int16;
+
+
 typedef unsigned char Byte;
 
 #if IS_X86_64
@@ -45,6 +51,23 @@ bool system_supports_avx512() {
 }
 #endif
 
+static inline minmax_result_int16 minmax_pairwise_int16(const int16_t *a, size_t length) {
+    minmax_result_int16 result = {.min_val = a[length -1], .max_val = a[length-1]};
+
+    for (size_t i = 0; i < length - 1; i += 2) {
+        int16_t smaller = a[i] < a[i + 1] ? a[i] : a[i + 1];
+        int16_t larger = a[i] < a[i + 1] ? a[i + 1] : a[i];
+
+        if (smaller < result.min_val) {
+            result.min_val = smaller;
+        }
+        if (larger > result.max_val) {
+            result.max_val = larger;
+        }
+    }
+    return result;
+}
+
 static inline minmax_result_float32 minmax_pairwise_float32(const float *a, size_t length) {
     // Initialize min and max with the last element of the array.
     // This ensures that it works correctly for odd length arrays as well as even.
@@ -66,6 +89,17 @@ static inline minmax_result_float32 minmax_pairwise_float32(const float *a, size
 }
 
 #if IS_X86_64
+static inline minmax_result_int16 reduce_result_from_mm256i_int16(__m256i min_vals, __m256i max_vals, minmax_result_int16 result) {
+    int16_t temp_min[16], temp_max[16];
+    _mm256_storeu_si256((__m256i*)temp_min, min_vals);
+    _mm256_storeu_si256((__m256i*)temp_max, max_vals);
+    for (size_t i = 0; i < 16; ++i) {
+        if (temp_min[i] < result.min_val) result.min_val = temp_min[i];
+        if (temp_max[i] > result.max_val) result.max_val = temp_max[i];
+    }
+    return result;
+}
+
 static inline minmax_result_float32 reduce_result_from_mm256_float32(__m256 min_vals, __m256 max_vals, minmax_result_float32 result) {
     float temp_min[8], temp_max[8];
     _mm256_storeu_ps(temp_min, min_vals);
@@ -75,6 +109,27 @@ static inline minmax_result_float32 reduce_result_from_mm256_float32(__m256 min_
         if (temp_max[i] > result.max_val) result.max_val = temp_max[i];
     }
     return result;
+}
+
+minmax_result_int16 minmax_avx_int16(const int16_t *a, size_t length) {
+    minmax_result_int16 result = { .min_val = INT16_MAX, .max_val = INT16_MIN };
+
+    __m256i min_vals = _mm256_loadu_si256((__m256i*)a);
+    __m256i max_vals = min_vals;
+
+    // Process elements in chunks of 16 (256 bits / 16 bits per int16_t)
+    size_t i = 16;
+    for (; i <= length - 16; i += 16) {
+        __m256i vals = _mm256_loadu_si256((__m256i*)(a + i));
+        min_vals = _mm256_min_epi16(min_vals, vals);
+        max_vals = _mm256_max_epi16(max_vals, vals);
+    }
+    // Process remainder elements
+    if (i < length) {
+        result = minmax_pairwise_int16(a + i, length - i);
+    }
+
+    return reduce_result_from_mm256i_int16(min_vals, max_vals, result);
 }
 
 minmax_result_float32 minmax_avx_float32(const float *a, size_t length) {
@@ -131,6 +186,24 @@ minmax_result_float32 minmax_avx512_float32(const float *a, size_t length) {
     return reduce_result_from_mm512_float32(min_vals, max_vals, result);
 }
 #endif
+
+minmax_result_int16 minmax_contiguous_int16(const int16_t *a, size_t length) {
+    // Return early for empty arrays
+    if (length == 0) {
+        return (minmax_result_int16){0, 0};
+    }
+
+#if IS_X86_64
+    if (length >= 16) {
+        // TODO: Consider adding AVX512 support
+        return minmax_avx_int16(a, length);
+    } else {
+        return minmax_pairwise_int16(a, length);
+    }
+#else
+    return minmax_pairwise_int16(a, length);
+#endif
+}
 
 minmax_result_float32 minmax_contiguous_float32(const float *a, size_t length) {
     // Return early for empty arrays
