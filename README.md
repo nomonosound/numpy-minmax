@@ -28,16 +28,11 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 
 # Changelog
 
-## [0.3.0] - 2024-07-29
-
-### Added
-
-* Distribute source
+## [0.3.1] - 2024-08-15
 
 ### Changes
 
-* Add support for ARM (without NEON optimizations for now) on Linux and macOS
-* Update supported numpy version range to >=1.21,<2
+* Optimize (with AVX) the processing of contiguous int16 arrays. ~2.3x speedup compared to 0.3.0
 
 For the complete changelog, go to [CHANGELOG.md](CHANGELOG.md)
 
