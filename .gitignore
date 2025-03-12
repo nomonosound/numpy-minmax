@@ -161,3 +161,4 @@ cython_debug/
 
 # Dynamically generated version file
 numpy_minmax/_version.py
+.qodo

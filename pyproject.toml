@@ -8,7 +8,7 @@ version = "0.3.1"
 description = "A fast python library for finding both min and max value in a NumPy array"
 dependencies = [
     "cffi>=1.0.0",
-    "numpy>=1.21,<2"
+    "numpy>=1.21"
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
