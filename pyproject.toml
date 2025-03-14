@@ -8,7 +8,7 @@ version = "0.3.1"
 description = "A fast python library for finding both min and max value in a NumPy array"
 dependencies = [
     "cffi>=1.0.0",
-    "numpy>=1.21"
+    "numpy>=2,<3"
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -20,7 +20,6 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Scientific/Engineering",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

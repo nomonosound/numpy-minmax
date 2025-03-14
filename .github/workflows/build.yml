@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        arch: [x86_64, arm64]
-        python-version: [3.9]
+        os: [ubuntu-latest, windows-latest, ubuntu-22.04-arm64, macos-latest]
+        python-version: ['3.10']
 
     if: startsWith(github.event.head_commit.message, 'Release') || github.event_name == 'workflow_dispatch'
     steps:
@@ -29,7 +29,10 @@ jobs:
       - name: Build and test wheels
         env:
           CIBW_ARCHS: "auto64"
-          CIBW_SKIP: "cp36-* cp37-* cp38-* pp37-* pp38-* pp313-* cp313-* *-musllinux_x86_64"
+          CIBW_SKIP: >-
+            cp36-* cp37-* cp38-* cp313-* 
+            pp37-* pp38-* pp310-*
+            pp*win_*  # skipped due to cffi issue https://github.com/python-cffi/cffi/pull/118 and npy_cdouble related errors
           CC: clang
         run: |
           python -m cibuildwheel --output-dir wheelhouse
