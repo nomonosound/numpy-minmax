@@ -15,6 +15,10 @@
     #ifndef bit_AVX512F
     #define bit_AVX512F     (1 << 16)
     #endif
+
+    #ifndef bit_AVX
+    #define bit_AVX (1 << 28)
+    #endif
 #endif
 
 
@@ -48,6 +52,20 @@ bool system_supports_avx512() {
 
     // Check the AVX512F bit in EBX
     return (ebx & bit_AVX512F) != 0;
+}
+
+bool system_supports_avx() {
+    unsigned int eax, ebx, ecx, edx;
+
+    #ifdef _MSC_VER
+        int cpuInfo[4];
+        __cpuid(cpuInfo, 1);
+        ecx = cpuInfo[2];
+    #else
+        __cpuid(1, eax, ebx, ecx, edx);
+    #endif
+
+    return (ecx & bit_AVX) != 0;
 }
 #endif
 
@@ -196,7 +214,11 @@ minmax_result_int16 minmax_contiguous_int16(const int16_t *a, size_t length) {
 #if IS_X86_64
     if (length >= 16) {
         // TODO: Consider adding AVX512 support
-        return minmax_avx_int16(a, length);
+        if (system_supports_avx()) {
+            return minmax_avx_int16(a, length);
+        } else {
+            return minmax_pairwise_int16(a, length);
+        }
     } else {
         return minmax_pairwise_int16(a, length);
     }
@@ -215,8 +237,10 @@ minmax_result_float32 minmax_contiguous_float32(const float *a, size_t length) {
     if (length >= 16) {
         if (system_supports_avx512()) {
             return minmax_avx512_float32(a, length);
-        } else {
+        } else if (system_supports_avx()) {
             return minmax_avx_float32(a, length);
+        } else {
+            return minmax_pairwise_float32(a, length);
         }
     } else {
         return minmax_pairwise_float32(a, length);
@@ -318,7 +342,11 @@ minmax_result_float32 minmax_1d_strided_float32(const float *a, size_t length, l
             return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
         }
 #if IS_X86_64
-        return minmax_avx_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
+        if (system_supports_avx()) {
+            return minmax_avx_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
+        } else {
+            return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
+        }
 #else
         return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
 #endif
@@ -328,7 +356,11 @@ minmax_result_float32 minmax_1d_strided_float32(const float *a, size_t length, l
     if (length < 16){
         return minmax_pairwise_strided_float32((Byte*)a, length, stride);
     }
-    return minmax_avx_strided_float32((Byte*)a, length, stride);
+    if (system_supports_avx()) {
+        return minmax_avx_strided_float32((Byte*)a, length, stride);
+    } else {
+        return minmax_pairwise_strided_float32((Byte*)a, length, stride);
+    }
 #else
     return minmax_pairwise_strided_float32((Byte*)a, length, stride);
 #endif
