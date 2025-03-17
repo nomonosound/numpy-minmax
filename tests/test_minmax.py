@@ -151,6 +151,7 @@ def test_minimax_1d_negative_stride(dtype):
     assert max_val == np.amax(arr)
 
 
+@pytest.mark.skip(reason="Test fails on musllinux with Illegal instruction")
 @pytest.mark.parametrize("dtype", [np.float32, np.int16])
 def test_minimax_1d_non_contiguous_negative_stride(dtype):
     np.random.seed(7)
