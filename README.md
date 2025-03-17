@@ -9,7 +9,7 @@ NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we us
 # Installation
 
 [![PyPI version](https://img.shields.io/pypi/v/numpy-minmax.svg?style=flat)](https://pypi.org/project/numpy-minmax/)
-![python 3.8, 3.9, 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11|%203.12-blue)
+![python 3.9, 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11|%203.12-blue)
 ![os: Linux, macOS, Windows](https://img.shields.io/badge/OS-Linux%20%28arm%20%26%20x86%29%20|%20macOS%20%28arm%29%20|%20Windows%20%28x86%29-blue)
 
 ```
