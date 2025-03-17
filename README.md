@@ -28,11 +28,16 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 
 # Changelog
 
-## [0.3.1] - 2024-08-15
+## [0.4.0] - 2025-03-17
 
 ### Changes
 
-* Optimize (with AVX) the processing of contiguous int16 arrays. ~2.3x speedup compared to 0.3.0
+* Target numpy 2.x instead of numpy 1.x. If you still depend on numpy 1.x, you need an older version of numpy-minmax.
+* Process some types of arrays with a negative stride in a scalar way instead of vectorized for improved compatibility
+
+### Removed
+
+* Remove support for Python 3.8
 
 For the complete changelog, go to [CHANGELOG.md](CHANGELOG.md)
 

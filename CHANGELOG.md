@@ -3,6 +3,17 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-03-17
+
+### Changes
+
+* Target numpy 2.x instead of numpy 1.x. If you still depend on numpy 1.x, you need an older version of numpy-minmax.
+* Process some types of arrays with a negative stride in a scalar way instead of vectorized for improved compatibility
+
+### Removed
+
+* Remove support for Python 3.8
+
 ## [0.3.1] - 2024-08-15
 
 ### Changes
