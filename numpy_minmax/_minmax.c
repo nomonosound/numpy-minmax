@@ -314,14 +314,7 @@ minmax_result_float32 minmax_1d_strided_float32(const float *a, size_t length, l
         if (-stride == sizeof(float)){
             return minmax_contiguous_float32(a - length + 1, length);
         }
-        if (length < 16){
-            return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
-        }
-#if IS_X86_64
-        return minmax_avx_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
-#else
         return minmax_pairwise_strided_float32((Byte*)(a) + (length - 1)*stride, length, -stride);
-#endif
     }
 
 #if IS_X86_64
