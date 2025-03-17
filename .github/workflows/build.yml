@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, ubuntu-22.04-arm64, macos-latest]
+        #os: [ubuntu-latest, windows-latest, ubuntu-22.04-arm64, macos-latest]
+        os: [ubuntu-latest]
         python-version: ['3.10']
 
     if: startsWith(github.event.head_commit.message, 'Release') || github.event_name == 'workflow_dispatch'
@@ -33,6 +34,7 @@ jobs:
             cp36-* cp37-* cp38-* cp313-* 
             pp37-* pp38-* pp310-*
             pp*win_*  # skipped due to cffi issue https://github.com/python-cffi/cffi/pull/118 and npy_cdouble related errors
+            cp39-musllinux_x86_64  # skipped because CI runs into an unexpected AVX issue
           CC: clang
         run: |
           python -m cibuildwheel --output-dir wheelhouse
