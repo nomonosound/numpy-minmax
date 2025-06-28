@@ -30,7 +30,7 @@ jobs:
         env:
           CIBW_ARCHS: "auto64"
           CIBW_SKIP: >-
-            cp36-* cp37-* cp38-* cp313-* 
+            cp36-* cp37-* cp38-* 
             pp37-* pp38-* pp310-*
             pp*win_*  # skipped due to cffi issue https://github.com/python-cffi/cffi/pull/118 and npy_cdouble related errors
           CC: clang
