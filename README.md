@@ -9,8 +9,8 @@ NumPy lacked an optimized minmax function, so we wrote our own. At Nomono, we us
 # Installation
 
 [![PyPI version](https://img.shields.io/pypi/v/numpy-minmax.svg?style=flat)](https://pypi.org/project/numpy-minmax/)
-![python 3.9, 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11|%203.12-blue)
-![os: Linux, macOS, Windows](https://img.shields.io/badge/OS-Linux%20%28arm%20%26%20x86%29%20|%20macOS%20%28arm%29%20|%20Windows%20%28x86%29-blue)
+![python 3.9, 3.10, 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13-blue)
+![os: Linux, macOS, Windows](https://img.shields.io/badge/OS-Linux%20%28arm%20%26%20x86--64%29%20|%20macOS%20%28arm%29%20|%20Windows%20%28x86--64%29-blue)
 
 ```
 $ pip install numpy-minmax
@@ -28,16 +28,11 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 
 # Changelog
 
-## [0.4.0] - 2025-03-17
+## [0.5.0] - 2025-06-28
 
-### Changes
+### Added
 
-* Target numpy 2.x instead of numpy 1.x. If you still depend on numpy 1.x, you need an older version of numpy-minmax.
-* Process some types of arrays with a negative stride in a scalar way instead of vectorized for improved compatibility
-
-### Removed
-
-* Remove support for Python 3.8
+* Add support for Python 3.13
 
 For the complete changelog, go to [CHANGELOG.md](CHANGELOG.md)
 

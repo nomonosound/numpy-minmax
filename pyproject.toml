@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "numpy-minmax"
-version = "0.4.0"
+version = "0.5.0"
 description = "A fast python library for finding both min and max value in a NumPy array"
 dependencies = [
     "cffi>=1.0.0",
@@ -24,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 urls = { "Homepage" = "https://github.com/nomonosound/numpy-minmax" }
 
