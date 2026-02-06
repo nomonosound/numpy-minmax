@@ -28,11 +28,15 @@ min_val, max_val = numpy_minmax.minmax(arr)  # 0.0, 1336.0
 
 # Changelog
 
-## [0.5.0] - 2025-06-28
+## [0.6.0] - 2025-12-27
 
 ### Added
 
-* Add support for Python 3.13
+* Add support for Python 3.14
+
+### Removed
+
+* Remove support for Python 3.9
 
 For the complete changelog, go to [CHANGELOG.md](CHANGELOG.md)
 
