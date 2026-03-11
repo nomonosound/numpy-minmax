@@ -153,7 +153,7 @@ minmax_result_float32 minmax_avx_float32(const float *a, size_t length) {
     return reduce_result_from_mm256_float32(min_vals, max_vals, result);
 }
 
-static inline minmax_result_float32 reduce_result_from_mm512_float32(__m512 min_vals, __m512 max_vals, minmax_result_float32 result) {
+__attribute__((target("avx512f"))) static inline minmax_result_float32 reduce_result_from_mm512_float32(__m512 min_vals, __m512 max_vals, minmax_result_float32 result) {
     float temp_min[16], temp_max[16];
     _mm512_storeu_ps(temp_min, min_vals);
     _mm512_storeu_ps(temp_max, max_vals);
@@ -164,7 +164,7 @@ static inline minmax_result_float32 reduce_result_from_mm512_float32(__m512 min_
     return result;
 }
 
-minmax_result_float32 minmax_avx512_float32(const float *a, size_t length) {
+__attribute__((target("avx512f"))) minmax_result_float32 minmax_avx512_float32(const float *a, size_t length) {
     minmax_result_float32 result = { .min_val = FLT_MAX, .max_val = -FLT_MAX };
 
     __m512 min_vals = _mm512_loadu_ps(a);
